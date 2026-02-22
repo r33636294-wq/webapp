@@ -37,49 +37,49 @@
 
           <h3>Element Tools</h3>
           <div class="tool-row">
-            <button id="addTextBtn" type="button">+ Text</button>
-            <button id="addImageBtn" type="button">+ Image</button>
-            <button id="addShapeBtn" type="button">+ Shape</button>
+            <button id="toggleTextToolsBtn" type="button">Text Tools</button>
+            <button id="toggleImageToolsBtn" type="button">Image Tools</button>
+            <button id="addTextBtn" type="button">+ Add Text</button>
+            <button id="addImageBtn" type="button">+ Add Image</button>
+            <button id="addShapeBtn" type="button">+ Add Shape</button>
             <input id="hiddenImagePicker" type="file" accept="image/*" class="hidden" />
           </div>
 
-          <div class="edit-grid">
-            <section class="edit-box">
-              <h4>Text Tool</h4>
-              <label>Text <input id="textInput" type="text" /></label>
-              <label>Size <input id="textSizeInput" type="range" min="18" max="180" value="54" /></label>
-              <label>Font
-                <select id="textFontInput">
-                  <option value="Inter, Arial, sans-serif">Inter</option>
-                  <option value="Georgia, serif">Georgia</option>
-                  <option value="'Trebuchet MS', sans-serif">Trebuchet</option>
-                </select>
-              </label>
-              <label>Color <input id="textColorInput" type="color" value="#ffffff" /></label>
-              <label>Align
-                <select id="textAlignInput">
-                  <option value="left">Left</option>
-                  <option value="center">Center</option>
-                  <option value="right">Right</option>
-                </select>
-              </label>
-            </section>
+          <section id="textToolsPanel" class="edit-box horizontal-tools hidden">
+            <h4>Text Tool</h4>
+            <label>Text <input id="textInput" type="text" /></label>
+            <label>Size <input id="textSizeInput" type="range" min="18" max="180" value="54" /></label>
+            <label>Font
+              <select id="textFontInput">
+                <option value="Inter, Arial, sans-serif">Inter</option>
+                <option value="Georgia, serif">Georgia</option>
+                <option value="'Trebuchet MS', sans-serif">Trebuchet</option>
+              </select>
+            </label>
+            <label>Color <input id="textColorInput" type="color" value="#ffffff" /></label>
+            <label>Align
+              <select id="textAlignInput">
+                <option value="left">Left</option>
+                <option value="center">Center</option>
+                <option value="right">Right</option>
+              </select>
+            </label>
+          </section>
 
-            <section class="edit-box">
-              <h4>Image Tool</h4>
-              <button id="replaceImageBtn" type="button">Import/Replace Image</button>
-              <label>Image Size <input id="imageScaleInput" type="range" min="0.2" max="2.5" step="0.05" value="1" /></label>
+          <section id="imageToolsPanel" class="edit-box horizontal-tools hidden">
+            <h4>Image Tool</h4>
+            <button id="replaceImageBtn" type="button">Import/Replace Image</button>
+            <label>Image Size <input id="imageScaleInput" type="range" min="0.2" max="2.5" step="0.05" value="1" /></label>
 
-              <h4>Shape Tool</h4>
-              <label>Shape Type
-                <select id="shapeTypeInput">
-                  <option value="rect">Rectangle</option>
-                  <option value="circle">Circle</option>
-                </select>
-              </label>
-              <label>Shape Color <input id="shapeColorInput" type="color" value="#22d3ee" /></label>
-            </section>
-          </div>
+            <h4>Shape Tool</h4>
+            <label>Shape Type
+              <select id="shapeTypeInput">
+                <option value="rect">Rectangle</option>
+                <option value="circle">Circle</option>
+              </select>
+            </label>
+            <label>Shape Color <input id="shapeColorInput" type="color" value="#22d3ee" /></label>
+          </section>
 
           <h3>Footer Preset</h3>
           <div class="tool-row">

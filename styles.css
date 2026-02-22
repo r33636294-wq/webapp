@@ -15,8 +15,11 @@ canvas{display:block;width:100%;height:auto;border-radius:10px;background:#11182
 .preview-chip{min-width:90px;height:54px;border-radius:8px;border:1px solid #334067;display:grid;place-items:center;font-size:.75rem;color:#dbeafe}
 
 .tool-row{display:flex;gap:8px;flex-wrap:wrap;align-items:end}
-.edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .edit-box{background:#0f172a;border:1px solid #334067;border-radius:10px;padding:8px;display:grid;gap:6px;align-content:start}
+.horizontal-tools{display:flex;gap:8px;overflow-x:auto;align-items:end;flex-wrap:nowrap}
+.horizontal-tools label,.horizontal-tools button,.horizontal-tools h4{min-width:max-content}
+.horizontal-tools label{min-width:180px}
+#toggleTextToolsBtn.active,#toggleImageToolsBtn.active{background:#0ea5e9}
 
 input,button,select{font:inherit}
 button{background:#6366f1;color:white;border:0;border-radius:8px;padding:8px 10px}
@@ -34,5 +37,4 @@ label{display:grid;gap:4px;font-size:.82rem}
 .user-photo-preview{width:86px;height:86px;border-radius:999px;object-fit:cover;border:2px solid #5165a5}
 
 .hidden{display:none !important}
-@media (max-width:700px){.edit-grid{grid-template-columns:1fr}}
 @media (min-width:900px){.app{max-width:860px;margin:0 auto}}

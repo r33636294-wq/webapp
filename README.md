@@ -7,6 +7,7 @@ Mobile-first banner editor with splash, onboarding, draggable elements, and reus
 - New-user onboarding/login form (photo, name, position, phone) and save.
 - Editor supports selecting, dragging, moving, and resizing **text, image, and shape** elements directly on banner.
 - Add **Text / Image / Shape** with dedicated tools.
+- Text and Image tool buttons are clickable toggles (open/close horizontally).
 - Text editing tools: text, size, font style, color, alignment.
 - Image editing tools: import/replace and size scale.
 - Banner preset buttons (`1,2,3,4,5...`) to load preloaded daily banner backgrounds.

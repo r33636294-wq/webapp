@@ -18,6 +18,10 @@ const el = {
   footerColorB: document.getElementById('footerColorB'),
   footerAccent: document.getElementById('footerAccent'),
   saveFooterPresetBtn: document.getElementById('saveFooterPresetBtn'),
+  toggleTextToolsBtn: document.getElementById('toggleTextToolsBtn'),
+  toggleImageToolsBtn: document.getElementById('toggleImageToolsBtn'),
+  textToolsPanel: document.getElementById('textToolsPanel'),
+  imageToolsPanel: document.getElementById('imageToolsPanel'),
   addTextBtn: document.getElementById('addTextBtn'),
   addImageBtn: document.getElementById('addImageBtn'),
   addShapeBtn: document.getElementById('addShapeBtn'),
@@ -256,6 +260,27 @@ function syncFooterInputs() {
   el.footerAccent.value = p.accent;
 }
 
+
+function toggleToolPanel(panelName, forceOpen = null) {
+  const textOpen = !el.textToolsPanel.classList.contains('hidden');
+  const imageOpen = !el.imageToolsPanel.classList.contains('hidden');
+
+  if (panelName === 'text') {
+    const shouldOpen = forceOpen === null ? !textOpen : forceOpen;
+    el.textToolsPanel.classList.toggle('hidden', !shouldOpen);
+    el.imageToolsPanel.classList.add('hidden');
+    el.toggleTextToolsBtn.classList.toggle('active', shouldOpen);
+    el.toggleImageToolsBtn.classList.remove('active');
+    return;
+  }
+
+  const shouldOpen = forceOpen === null ? !imageOpen : forceOpen;
+  el.imageToolsPanel.classList.toggle('hidden', !shouldOpen);
+  el.textToolsPanel.classList.add('hidden');
+  el.toggleImageToolsBtn.classList.toggle('active', shouldOpen);
+  el.toggleTextToolsBtn.classList.remove('active');
+}
+
 function updateSelectedFromTools() {
   const e = selectedElement();
   if (!e) return;
@@ -281,6 +306,8 @@ function updateSelectedFromTools() {
 function syncToolsFromSelection() {
   const e = selectedElement();
   if (!e) return;
+  if (e.type === 'text') toggleToolPanel('text', true);
+  if (e.type === 'image' || e.type === 'shape') toggleToolPanel('image', true);
   if (e.type === 'text') {
     el.textInput.value = e.text;
     el.textSizeInput.value = String(e.fontSize);
@@ -354,6 +381,9 @@ function onPointerUp() {
 }
 
 function bindEvents() {
+  el.toggleTextToolsBtn.addEventListener('click', () => toggleToolPanel('text'));
+  el.toggleImageToolsBtn.addEventListener('click', () => toggleToolPanel('image'));
+
   el.addTextBtn.addEventListener('click', () => {
     const e = { id: genId(), type: 'text', x: 120, y: 220, w: 500, h: 120, text: 'New Text', fontSize: 54, fontFamily: 'Inter, Arial, sans-serif', color: '#ffffff', align: 'left' };
     state.elements.push(e);
