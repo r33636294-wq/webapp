@@ -1,12 +1,13 @@
 # Personal Poster / Banner Editor
 
-A lightweight browser-based editor for designing personal posters and banners.
+A lightweight browser-based editor for designing posters, banners, and social creatives.
 
 ## Features
-- Presets: Instagram Post, Facebook Post, Instagram Story, Facebook Story, Full Screen Mobile, A4, slide, and social banner.
-- Dedicated **Image Tools** tab with import/add image, crop zoom, move, rotate, resize, and blend controls.
-- Image styling: solid/gradient tint color, texture overlays (noise/grid), stroke, and shadow controls.
-- Editable title + subtitle with size/color controls and one-click PNG export.
+- Social presets: Instagram/Facebook post & story, full-screen mobile, A4, slide, banner.
+- Advanced **Text Tools**: add text, resize, solid/gradient fill, texture image fill, stroke, inner/outer shadow, inner/outer glow.
+- On-canvas text interactions with mouse and touch: drag to move and handle-drag to resize.
+- Advanced **Image Tools**: import/add image, crop zoom, rotate, resize, blend modes, texture, stroke, shadow.
+- PNG export.
 
 ## Run locally
 ```bash
@@ -15,25 +16,13 @@ python3 -m http.server 4173
 Open `http://localhost:4173`.
 
 ## Run on GitHub, test, and launch (GitHub Pages)
-1. Push your repository to GitHub.
-2. CI workflow (`.github/workflows/ci.yml`) runs smoke tests on PRs and pushes.
-3. Pages workflow (`.github/workflows/deploy-pages.yml`) deploys on `main` or manual trigger.
+1. Push repository to GitHub.
+2. CI workflow (`.github/workflows/ci.yml`) runs smoke tests.
+3. Deploy workflow (`.github/workflows/deploy-pages.yml`) publishes to Pages.
 4. In **Settings → Pages**, set source to **GitHub Actions**.
 
 ## Test hosted app on the web
-After deployment succeeds, open your Pages URL:
-
-`https://<your-username>.github.io/<your-repo>/`
-
-Then validate quickly from terminal:
-
 ```bash
 curl -I https://<your-username>.github.io/<your-repo>/
 curl -fsS https://<your-username>.github.io/<your-repo>/ | grep -q "Poster / Banner Editor"
 ```
-
-Manual browser checks:
-- change preset to **Instagram Story (1080×1920)**
-- switch to **Image Tools** and upload an image
-- apply rotate/blend/texture and verify preview updates
-- click **Download PNG** and confirm export file is downloaded

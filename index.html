@@ -10,7 +10,7 @@
     <main class="app">
       <section class="panel">
         <h1>Poster / Banner Editor</h1>
-        <p class="subtitle">Build social posts, stories, and custom mobile/fullscreen banners.</p>
+        <p class="subtitle">Design social creatives with advanced image and text controls.</p>
 
         <label>
           Preset
@@ -32,47 +32,110 @@
         </label>
 
         <div class="tabs">
-          <button class="tab active" data-tab="textTab" type="button">Text</button>
+          <button class="tab active" data-tab="textTab" type="button">Text Tools</button>
           <button class="tab" data-tab="imageTab" type="button">Image Tools</button>
         </div>
 
         <section id="textTab" class="tab-panel active">
           <label>
-            Title
-            <input id="titleText" type="text" value="YOUR EVENT TITLE" maxlength="80" />
+            Add Text
+            <input id="mainText" type="text" maxlength="120" value="YOUR MAIN MESSAGE" />
           </label>
 
           <div class="row">
             <label>
-              Title Color
-              <input id="titleColor" type="color" value="#ffffff" />
+              Text Size
+              <input id="textSize" type="range" min="24" max="260" value="120" />
             </label>
             <label>
-              Size
-              <input id="titleSize" type="range" min="24" max="240" value="96" />
+              Color Mode
+              <select id="textColorMode">
+                <option value="solid">Solid</option>
+                <option value="gradient">Gradient</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="row">
+            <label>
+              Color A
+              <input id="textColorA" type="color" value="#ffffff" />
+            </label>
+            <label>
+              Color B
+              <input id="textColorB" type="color" value="#ff7eb3" />
             </label>
           </div>
 
           <label>
-            Subtitle
-            <input id="subtitleText" type="text" value="Date • Venue • Call to Action" maxlength="120" />
+            Texture (Select Image)
+            <input id="textTextureImage" type="file" accept="image/*" />
           </label>
 
           <div class="row">
             <label>
-              Subtitle Color
-              <input id="subtitleColor" type="color" value="#f3f4f6" />
+              Stroke Width
+              <input id="textStrokeWidth" type="range" min="0" max="24" value="0" />
             </label>
             <label>
-              Size
-              <input id="subtitleSize" type="range" min="16" max="120" value="42" />
+              Stroke Color
+              <input id="textStrokeColor" type="color" value="#000000" />
             </label>
           </div>
 
-          <label>
-            Overlay Strength
-            <input id="overlay" type="range" min="0" max="0.9" step="0.05" value="0.35" />
-          </label>
+          <div class="row">
+            <label>
+              Shadow Type
+              <select id="shadowType">
+                <option value="none">None</option>
+                <option value="outer">Outer</option>
+                <option value="inner">Inner</option>
+              </select>
+            </label>
+            <label>
+              Shadow Color
+              <input id="shadowColor" type="color" value="#000000" />
+            </label>
+          </div>
+
+          <div class="row">
+            <label>
+              Shadow Radius
+              <input id="shadowRadius" type="range" min="0" max="80" value="12" />
+            </label>
+            <label>
+              Shadow Blur
+              <input id="shadowBlur" type="range" min="0" max="80" value="16" />
+            </label>
+          </div>
+
+          <div class="row">
+            <label>
+              Glow Type
+              <select id="glowType">
+                <option value="none">None</option>
+                <option value="outer">Outer</option>
+                <option value="inner">Inner</option>
+              </select>
+            </label>
+            <label>
+              Glow Color
+              <input id="glowColor" type="color" value="#60a5fa" />
+            </label>
+          </div>
+
+          <div class="row">
+            <label>
+              Glow Radius
+              <input id="glowRadius" type="range" min="0" max="90" value="18" />
+            </label>
+            <label>
+              Glow Blur
+              <input id="glowBlur" type="range" min="0" max="90" value="28" />
+            </label>
+          </div>
+
+          <p class="hint">Tip: Drag text on canvas to move. Drag corner handle to resize (mouse/touch).</p>
         </section>
 
         <section id="imageTab" class="tab-panel">
@@ -82,31 +145,14 @@
           </label>
 
           <div class="row">
-            <label>
-              Crop Zoom
-              <input id="imgZoom" type="range" min="0.4" max="3" step="0.05" value="1" />
-            </label>
-            <label>
-              Resize
-              <input id="imgScale" type="range" min="0.3" max="2" step="0.05" value="1" />
-            </label>
+            <label>Crop Zoom<input id="imgZoom" type="range" min="0.4" max="3" step="0.05" value="1" /></label>
+            <label>Resize<input id="imgScale" type="range" min="0.3" max="2" step="0.05" value="1" /></label>
           </div>
-
           <div class="row">
-            <label>
-              Move X
-              <input id="imgX" type="range" min="-1" max="1" step="0.01" value="0" />
-            </label>
-            <label>
-              Move Y
-              <input id="imgY" type="range" min="-1" max="1" step="0.01" value="0" />
-            </label>
+            <label>Move X<input id="imgX" type="range" min="-1" max="1" step="0.01" value="0" /></label>
+            <label>Move Y<input id="imgY" type="range" min="-1" max="1" step="0.01" value="0" /></label>
           </div>
-
-          <label>
-            Rotate
-            <input id="imgRotate" type="range" min="-180" max="180" step="1" value="0" />
-          </label>
+          <label>Rotate<input id="imgRotate" type="range" min="-180" max="180" step="1" value="0" /></label>
 
           <div class="row">
             <label>
@@ -130,14 +176,8 @@
           </div>
 
           <div class="row">
-            <label>
-              Color A
-              <input id="imgColorA" type="color" value="#ff6b6b" />
-            </label>
-            <label>
-              Color B
-              <input id="imgColorB" type="color" value="#4d96ff" />
-            </label>
+            <label>Color A<input id="imgColorA" type="color" value="#ff6b6b" /></label>
+            <label>Color B<input id="imgColorB" type="color" value="#4d96ff" /></label>
           </div>
 
           <div class="row">
@@ -149,38 +189,20 @@
                 <option value="grid">Grid</option>
               </select>
             </label>
-            <label>
-              Stroke Width
-              <input id="imgStrokeWidth" type="range" min="0" max="30" step="1" value="0" />
-            </label>
+            <label>Stroke Width<input id="imgStrokeWidth" type="range" min="0" max="30" step="1" value="0" /></label>
           </div>
 
           <div class="row">
-            <label>
-              Stroke Color
-              <input id="imgStrokeColor" type="color" value="#ffffff" />
-            </label>
-            <label>
-              Shadow Blur
-              <input id="imgShadowBlur" type="range" min="0" max="80" step="1" value="0" />
-            </label>
+            <label>Stroke Color<input id="imgStrokeColor" type="color" value="#ffffff" /></label>
+            <label>Shadow Blur<input id="imgShadowBlur" type="range" min="0" max="80" step="1" value="0" /></label>
           </div>
 
           <div class="row">
-            <label>
-              Shadow X
-              <input id="imgShadowX" type="range" min="-80" max="80" step="1" value="0" />
-            </label>
-            <label>
-              Shadow Y
-              <input id="imgShadowY" type="range" min="-80" max="80" step="1" value="0" />
-            </label>
+            <label>Shadow X<input id="imgShadowX" type="range" min="-80" max="80" step="1" value="0" /></label>
+            <label>Shadow Y<input id="imgShadowY" type="range" min="-80" max="80" step="1" value="0" /></label>
           </div>
 
-          <label>
-            Shadow Color
-            <input id="imgShadowColor" type="color" value="#000000" />
-          </label>
+          <label>Shadow Color<input id="imgShadowColor" type="color" value="#000000" /></label>
         </section>
 
         <div class="actions">
@@ -195,7 +217,6 @@
         </div>
       </section>
     </main>
-
     <script src="app.js"></script>
   </body>
 </html>
