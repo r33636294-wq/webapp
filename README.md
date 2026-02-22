@@ -19,3 +19,21 @@ Open `http://localhost:4173`.
 2. CI workflow (`.github/workflows/ci.yml`) runs smoke tests on PRs and pushes.
 3. Pages workflow (`.github/workflows/deploy-pages.yml`) deploys on `main` or manual trigger.
 4. In **Settings → Pages**, set source to **GitHub Actions**.
+
+## Test hosted app on the web
+After deployment succeeds, open your Pages URL:
+
+`https://<your-username>.github.io/<your-repo>/`
+
+Then validate quickly from terminal:
+
+```bash
+curl -I https://<your-username>.github.io/<your-repo>/
+curl -fsS https://<your-username>.github.io/<your-repo>/ | grep -q "Poster / Banner Editor"
+```
+
+Manual browser checks:
+- change preset to **Instagram Story (1080×1920)**
+- switch to **Image Tools** and upload an image
+- apply rotate/blend/texture and verify preview updates
+- click **Download PNG** and confirm export file is downloaded
