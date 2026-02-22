@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Start static server
+        run: |
+          python3 -m http.server 4173 &
+          echo $! > /tmp/http-server.pid
+          sleep 2
+
+      - name: Smoke test homepage
+        run: |
+          curl -fsS http://127.0.0.1:4173/ | tee /tmp/index.html
+          grep -q "Poster / Banner Editor" /tmp/index.html
+
+      - name: Smoke test assets
+        run: |
+          curl -fsS http://127.0.0.1:4173/styles.css > /tmp/styles.css
+          curl -fsS http://127.0.0.1:4173/app.js > /tmp/app.js
+
+      - name: Stop static server
+        if: always()
+        run: |
+          kill "$(cat /tmp/http-server.pid)" || true
