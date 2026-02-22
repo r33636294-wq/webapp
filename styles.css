@@ -6,26 +6,136 @@
   --muted: #9ca3af;
   --accent: #6366f1;
 }
+
 * { box-sizing: border-box; }
-body { margin: 0; font-family: Inter, system-ui, sans-serif; background: radial-gradient(circle at top, #172554 0%, var(--bg) 50%); color: var(--text); }
-.app { min-height: 100vh; display: grid; grid-template-columns: minmax(340px, 450px) 1fr; gap: 1rem; padding: 1rem; }
-.panel { background: color-mix(in srgb, var(--panel) 92%, black); border: 1px solid #2a3557; border-radius: 16px; padding: 1rem; display: grid; gap: 0.9rem; align-content: start; max-height: calc(100vh - 2rem); overflow: auto; }
-.subtitle { margin: -0.5rem 0 0.5rem; color: var(--muted); }
-.hint { margin: 0.25rem 0 0; color: var(--muted); font-size: 0.8rem; }
-label { display: grid; gap: 0.35rem; font-size: 0.88rem; }
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, sans-serif;
+  background: radial-gradient(circle at top, #172554 0%, var(--bg) 50%);
+  color: var(--text);
+}
+
+.app {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.panel {
+  background: color-mix(in srgb, var(--panel) 92%, black);
+  border: 1px solid #2a3557;
+  border-radius: 16px;
+  padding: 1rem;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.subtitle { margin: -0.5rem 0 0.2rem; color: var(--muted); }
+.hint { margin: 0; color: var(--muted); font-size: 0.8rem; white-space: nowrap; }
+
+label { display: grid; gap: 0.35rem; font-size: 0.84rem; min-width: 180px; }
 input, select, button { font: inherit; }
-input[type='text'], select { border: 1px solid #334067; border-radius: 8px; padding: 0.55rem 0.65rem; background: #0f172a; color: var(--text); }
-input[type='file'] { color: var(--muted); }
-.tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
-.tab { background: #1f2b45; border: 1px solid #334067; border-radius: 8px; padding: 0.55rem; }
+input[type='text'], select {
+  border: 1px solid #334067;
+  border-radius: 8px;
+  padding: 0.45rem 0.6rem;
+  background: #0f172a;
+  color: var(--text);
+}
+input[type='file'] { color: var(--muted); max-width: 230px; }
+
+
+.quick-controls {
+  display: flex;
+  gap: 0.75rem;
+  align-items: end;
+  overflow-x: auto;
+}
+
+.quick-controls > label:first-child { min-width: 280px; }
+.quick-controls > label:last-child { min-width: 130px; }
+
+.tabs {
+  display: flex;
+  gap: 0.6rem;
+  overflow-x: auto;
+}
+
+.tab {
+  background: #1f2b45;
+  border: 1px solid #334067;
+  border-radius: 8px;
+  padding: 0.5rem 0.8rem;
+  white-space: nowrap;
+}
+
 .tab.active { background: var(--accent); border-color: #7174ff; }
-.tab-panel { display: none; gap: 0.8rem; }
-.tab-panel.active { display: grid; }
-.row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
-.actions { margin-top: 0.5rem; display: flex; gap: 0.75rem; }
-button { border: 0; border-radius: 10px; padding: 0.7rem 0.95rem; background: var(--accent); color: white; cursor: pointer; font-weight: 600; }
+
+.tab-panel { display: none; }
+.tab-panel.active {
+  display: flex;
+  gap: 0.7rem;
+  align-items: end;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+
+.row {
+  display: flex;
+  gap: 0.7rem;
+  align-items: end;
+}
+
+.row > label { min-width: 160px; }
+
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.2rem;
+}
+
+button {
+  border: 0;
+  border-radius: 10px;
+  padding: 0.65rem 0.95rem;
+  background: var(--accent);
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 button.secondary { background: #24324f; }
-.preview-wrap { display: grid; place-items: center; background: rgba(8, 12, 26, 0.5); border: 1px solid #2a3557; border-radius: 16px; padding: 1rem; }
-.stage { max-width: min(95vw, 1200px); max-height: calc(100vh - 4rem); overflow: auto; border-radius: 12px; border: 1px solid #334067; background: #111827; }
-canvas { display: block; width: min(100%, 1200px); height: auto; touch-action: none; }
-@media (max-width: 1000px) { .app { grid-template-columns: 1fr; } .stage { max-height: 60vh; } .panel { max-height: unset; } }
+
+.preview-wrap {
+  display: grid;
+  place-items: center;
+  background: rgba(8, 12, 26, 0.5);
+  border: 1px solid #2a3557;
+  border-radius: 16px;
+  padding: 1rem;
+}
+
+.stage {
+  width: 100%;
+  max-width: min(96vw, 1400px);
+  max-height: calc(100vh - 18rem);
+  overflow: auto;
+  border-radius: 12px;
+  border: 1px solid #334067;
+  background: #111827;
+}
+
+canvas {
+  display: block;
+  width: min(100%, 1400px);
+  height: auto;
+  touch-action: none;
+}
+
+@media (max-width: 1000px) {
+  .stage { max-height: 58vh; }
+}

@@ -12,24 +12,26 @@
         <h1>Poster / Banner Editor</h1>
         <p class="subtitle">Design social creatives with advanced image and text controls.</p>
 
-        <label>
-          Preset
-          <select id="preset">
-            <option value="1200x628">Social Banner (1200×628)</option>
-            <option value="1080x1080">Instagram Post (1080×1080)</option>
-            <option value="1200x1200">Facebook Post (1200×1200)</option>
-            <option value="1080x1920">Instagram Story (1080×1920)</option>
-            <option value="1080x1920">Facebook Story (1080×1920)</option>
-            <option value="1080x2400">Full Screen Mobile (1080×2400)</option>
-            <option value="2480x3508">A4 Poster (2480×3508)</option>
-            <option value="1920x1080">Presentation Slide (1920×1080)</option>
-          </select>
-        </label>
+        <div class="quick-controls">
+          <label>
+            Preset
+            <select id="preset">
+              <option value="1200x628">Social Banner (1200×628)</option>
+              <option value="1080x1080">Instagram Post (1080×1080)</option>
+              <option value="1200x1200">Facebook Post (1200×1200)</option>
+              <option value="1080x1920">Instagram Story (1080×1920)</option>
+              <option value="1080x1920">Facebook Story (1080×1920)</option>
+              <option value="1080x2400">Full Screen Mobile (1080×2400)</option>
+              <option value="2480x3508">A4 Poster (2480×3508)</option>
+              <option value="1920x1080">Presentation Slide (1920×1080)</option>
+            </select>
+          </label>
 
-        <label>
-          Canvas Color
-          <input id="bgColor" type="color" value="#1f2937" />
-        </label>
+          <label>
+            Canvas Color
+            <input id="bgColor" type="color" value="#1f2937" />
+          </label>
+        </div>
 
         <div class="tabs">
           <button class="tab active" data-tab="textTab" type="button">Text Tools</button>
