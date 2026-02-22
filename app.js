@@ -18,7 +18,13 @@ const el = {
   userPhotoPreview: document.getElementById('userPhotoPreview'),
   userName: document.getElementById('userName'),
   userPosition: document.getElementById('userPosition'),
-  userPhone: document.getElementById('userPhone')
+  userPhone: document.getElementById('userPhone'),
+  editorPage: document.getElementById('editorPage'),
+  galleryPage: document.getElementById('galleryPage'),
+  openGalleryBtn: document.getElementById('openGalleryBtn'),
+  openEditorBtn: document.getElementById('openEditorBtn'),
+  galleryGrid: document.getElementById('galleryGrid'),
+  galleryDateLabel: document.getElementById('galleryDateLabel')
 };
 const ctx = el.canvas.getContext('2d');
 
@@ -34,6 +40,16 @@ const state = {
   ],
   selectedLayerId: 3
 };
+
+
+const galleryItems = [
+  { title: 'Viral Maharashtra', date: '2026-02-22', img: 'https://images.unsplash.com/photo-1473973916745-60839aebf06b?auto=format&fit=crop&w=700&q=80' },
+  { title: 'Sant Raja Janmotsav', date: '2026-02-22', img: 'https://images.unsplash.com/photo-1508675801627-066ac4346a55?auto=format&fit=crop&w=700&q=80' },
+  { title: 'Chhatrapati Shivaji Tribute', date: '2026-02-23', img: 'https://images.unsplash.com/photo-1524499982521-1ffd58dd89ea?auto=format&fit=crop&w=700&q=80' },
+  { title: 'National Service Message', date: '2026-02-23', img: 'https://images.unsplash.com/photo-1509099863731-ef4bff19e808?auto=format&fit=crop&w=700&q=80' },
+  { title: 'Social Awareness Poster', date: '2026-02-24', img: 'https://images.unsplash.com/photo-1472145246862-b24cf25c4a36?auto=format&fit=crop&w=700&q=80' },
+  { title: 'Daily Event Creative', date: '2026-02-24', img: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=700&q=80' }
+];
 
 function applyLayerData(layer) {
   if (layer.type === 'image') {
@@ -280,6 +296,7 @@ function showOnboardingIfNeeded() {
   const profile = getStoredProfile();
   if (profile) {
     el.onboardingScreen.classList.add('hidden');
+    openPage('gallery');
     return;
   }
   el.onboardingScreen.classList.remove('hidden');
@@ -298,6 +315,7 @@ function saveProfile(event) {
 
   localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
   el.onboardingScreen.classList.add('hidden');
+  openPage('gallery');
 }
 
 el.userPhoto.addEventListener('change', (event) => {
@@ -317,5 +335,45 @@ el.userPhoto.addEventListener('change', (event) => {
 });
 
 el.onboardingForm.addEventListener('submit', saveProfile);
+el.openGalleryBtn.addEventListener('click', () => openPage('gallery'));
+el.openEditorBtn.addEventListener('click', () => openPage('editor'));
 
+renderGallery();
 hideSplashScreen();
+
+
+function formatDateLabel() {
+  const now = new Date();
+  return now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function renderGallery() {
+  el.galleryDateLabel.textContent = `Updated: ${formatDateLabel()}`;
+  el.galleryGrid.innerHTML = '';
+  galleryItems.forEach((item) => {
+    const card = document.createElement('article');
+    card.className = 'banner-card';
+    card.innerHTML = `
+      <img src="${item.img}" alt="${item.title}" loading="lazy" />
+      <div class="banner-meta">
+        <div class="banner-date">${item.date}</div>
+        <div>${item.title}</div>
+      </div>
+    `;
+    el.galleryGrid.append(card);
+  });
+}
+
+function openPage(page) {
+  if (page === 'gallery') {
+    el.editorPage.classList.remove('active');
+    el.galleryPage.classList.add('active');
+    el.openGalleryBtn.classList.add('hidden');
+    el.openEditorBtn.classList.remove('hidden');
+    return;
+  }
+  el.galleryPage.classList.remove('active');
+  el.editorPage.classList.add('active');
+  el.openEditorBtn.classList.add('hidden');
+  el.openGalleryBtn.classList.remove('hidden');
+}

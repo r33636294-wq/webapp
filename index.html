@@ -11,78 +11,83 @@
       <img src="assets/start-logo.svg" alt="App logo" class="splash-logo" />
       <p class="splash-title">RITESH GAIKWAD</p>
     </div>
+
     <section id="onboardingScreen" class="onboarding-screen hidden" aria-label="New user onboarding">
       <form id="onboardingForm" class="onboarding-card">
         <h2>Welcome</h2>
         <p>Create your profile to continue.</p>
-
-        <label>Photo
-          <input id="userPhoto" type="file" accept="image/*" />
-        </label>
+        <label>Photo <input id="userPhoto" type="file" accept="image/*" /></label>
         <img id="userPhotoPreview" class="user-photo-preview hidden" alt="Profile preview" />
-
-        <label>Name
-          <input id="userName" type="text" placeholder="Your full name" required />
-        </label>
-        <label>Position
-          <input id="userPosition" type="text" placeholder="Your position" required />
-        </label>
-        <label>Phone Number
-          <input id="userPhone" type="tel" placeholder="Phone number" required />
-        </label>
-
+        <label>Name <input id="userName" type="text" placeholder="Your full name" required /></label>
+        <label>Position <input id="userPosition" type="text" placeholder="Your position" required /></label>
+        <label>Phone Number <input id="userPhone" type="tel" placeholder="Phone number" required /></label>
         <button id="saveProfileBtn" type="submit">Save & Continue</button>
       </form>
     </section>
+
     <main class="app">
-      <section class="preview-wrap">
-        <div class="stage" id="stage">
-          <canvas id="canvas" width="1080" height="1920"></canvas>
-          <aside class="layers" id="layersPanel">
-            <div class="layers-head">
-              <h3>Layers</h3>
-              <button id="addLayerBtn" type="button">+ Add</button>
-            </div>
-            <div id="layersList" class="layers-list"></div>
-          </aside>
-        </div>
+      <section id="editorPage" class="page active">
+        <section class="preview-wrap">
+          <div class="stage" id="stage">
+            <canvas id="canvas" width="1080" height="1920"></canvas>
+            <aside class="layers" id="layersPanel">
+              <div class="layers-head">
+                <h3>Layers</h3>
+                <button id="addLayerBtn" type="button">+ Add</button>
+              </div>
+              <div id="layersList" class="layers-list"></div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="tool-panels">
+          <div id="bgTools" class="tool-panel active">
+            <label>Preset
+              <select id="preset">
+                <option value="1080x1920">Instagram Story</option>
+                <option value="1080x1080">Instagram Post</option>
+                <option value="1200x1200">Facebook Post</option>
+                <option value="1080x2400">Full Screen Mobile</option>
+              </select>
+            </label>
+            <label>Background Color <input id="bgColor" type="color" value="#1f2937" /></label>
+          </div>
+
+          <div id="imageTools" class="tool-panel">
+            <label>Image Upload <input id="imgUpload" type="file" accept="image/*" /></label>
+            <label>Scale <input id="imgScale" type="range" min="0.2" max="2" step="0.05" value="1" /></label>
+            <label>Rotate <input id="imgRotate" type="range" min="-180" max="180" value="0" /></label>
+            <label>Blend
+              <select id="imgBlend">
+                <option value="source-over">Normal</option>
+                <option value="lighten">Lighten</option>
+                <option value="darken">Darken</option>
+                <option value="overlay">Overlay</option>
+                <option value="screen">Screen</option>
+              </select>
+            </label>
+          </div>
+
+          <div id="textTools" class="tool-panel">
+            <label>Text <input id="textValue" type="text" value="YOUR MESSAGE" /></label>
+            <label>Size <input id="textSize" type="range" min="24" max="220" value="120" /></label>
+            <label>Color <input id="textColor" type="color" value="#ffffff" /></label>
+          </div>
+        </section>
       </section>
 
-      <section class="tool-panels">
-        <div id="bgTools" class="tool-panel active">
-          <label>Preset
-            <select id="preset">
-              <option value="1080x1920">Instagram Story</option>
-              <option value="1080x1080">Instagram Post</option>
-              <option value="1200x1200">Facebook Post</option>
-              <option value="1080x2400">Full Screen Mobile</option>
-            </select>
-          </label>
-          <label>Background Color
-            <input id="bgColor" type="color" value="#1f2937" />
-          </label>
+      <section id="galleryPage" class="page gallery-page">
+        <header class="gallery-head">
+          <h2>Daily Event Banners</h2>
+          <p id="galleryDateLabel"></p>
+        </header>
+        <div class="chips">
+          <button class="chip active">Latest</button>
+          <button class="chip">Maharashtra</button>
+          <button class="chip">Jayanti</button>
+          <button class="chip">Festival</button>
         </div>
-
-        <div id="imageTools" class="tool-panel">
-          <label>Image Upload <input id="imgUpload" type="file" accept="image/*" /></label>
-          <label>Scale <input id="imgScale" type="range" min="0.2" max="2" step="0.05" value="1" /></label>
-          <label>Rotate <input id="imgRotate" type="range" min="-180" max="180" value="0" /></label>
-          <label>Blend
-            <select id="imgBlend">
-              <option value="source-over">Normal</option>
-              <option value="lighten">Lighten</option>
-              <option value="darken">Darken</option>
-              <option value="overlay">Overlay</option>
-              <option value="screen">Screen</option>
-            </select>
-          </label>
-        </div>
-
-        <div id="textTools" class="tool-panel">
-          <label>Text <input id="textValue" type="text" value="YOUR MESSAGE" /></label>
-          <label>Size <input id="textSize" type="range" min="24" max="220" value="120" /></label>
-          <label>Color <input id="textColor" type="color" value="#ffffff" /></label>
-        </div>
+        <div id="galleryGrid" class="gallery-grid"></div>
       </section>
     </main>
 
@@ -90,6 +95,8 @@
       <button class="tool-toggle active" data-target="bgTools" type="button">Background</button>
       <button class="tool-toggle" data-target="imageTools" type="button">Image</button>
       <button class="tool-toggle" data-target="textTools" type="button">Text</button>
+      <button id="openGalleryBtn" type="button">Gallery</button>
+      <button id="openEditorBtn" type="button" class="hidden">Editor</button>
       <button id="downloadBtn" type="button">PNG</button>
     </footer>
 
