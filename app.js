@@ -24,7 +24,8 @@ const el = {
   openGalleryBtn: document.getElementById('openGalleryBtn'),
   openEditorBtn: document.getElementById('openEditorBtn'),
   galleryGrid: document.getElementById('galleryGrid'),
-  galleryDateLabel: document.getElementById('galleryDateLabel')
+  galleryDateLabel: document.getElementById('galleryDateLabel'),
+  selectedTemplateLabel: document.getElementById('selectedTemplateLabel')
 };
 const ctx = el.canvas.getContext('2d');
 
@@ -50,6 +51,51 @@ const galleryItems = [
   { title: 'Social Awareness Poster', date: '2026-02-24', img: 'https://images.unsplash.com/photo-1472145246862-b24cf25c4a36?auto=format&fit=crop&w=700&q=80' },
   { title: 'Daily Event Creative', date: '2026-02-24', img: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=700&q=80' }
 ];
+
+
+
+async function toDataUrlFromRemote(url) {
+  const response = await fetch(url);
+  const blob = await response.blob();
+  return await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function openTemplateInEditor(item) {
+  try {
+    const dataUrl = await toDataUrlFromRemote(item.img);
+    await new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        state.imageBase.image = img;
+        state.imageBase.scale = 1;
+        state.imageBase.rotate = 0;
+        state.imageBase.blend = 'source-over';
+        const imageLayer = state.layers.find((layer) => layer.type === 'image');
+        if (imageLayer) {
+          imageLayer.visible = true;
+          imageLayer.locked = false;
+          persistLayerData(imageLayer);
+          state.selectedLayerId = imageLayer.id;
+        }
+        el.selectedTemplateLabel.textContent = `Template: ${item.title} (${item.date})`;
+        el.selectedTemplateLabel.classList.remove('hidden');
+        renderLayersUI();
+        render();
+        openPage('editor');
+        resolve();
+      };
+      img.onerror = reject;
+      img.src = dataUrl;
+    });
+  } catch {
+    alert('Unable to load template right now. Please try again.');
+  }
+}
 
 function applyLayerData(layer) {
   if (layer.type === 'image') {
@@ -353,6 +399,8 @@ function renderGallery() {
   galleryItems.forEach((item) => {
     const card = document.createElement('article');
     card.className = 'banner-card';
+    card.setAttribute('role', 'button');
+    card.tabIndex = 0;
     card.innerHTML = `
       <img src="${item.img}" alt="${item.title}" loading="lazy" />
       <div class="banner-meta">
@@ -360,6 +408,15 @@ function renderGallery() {
         <div>${item.title}</div>
       </div>
     `;
+    card.addEventListener('click', () => {
+      openTemplateInEditor(item);
+    });
+    card.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        openTemplateInEditor(item);
+      }
+    });
     el.galleryGrid.append(card);
   });
 }

@@ -11,6 +11,7 @@ Mobile-first poster/banner editor with layer controls and bottom taskbar tools.
 - Splash opening screen with logo + app name (`RITESH GAIKWAD`).
 - New-user login/onboarding page with photo, name, position, phone number, and save.
 - Third page gallery with preloaded daily event banners and date labels.
+- Click any gallery template to open the fourth page (editor) with that template loaded.
 
 ## Run locally
 ```bash
