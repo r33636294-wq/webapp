@@ -1,335 +1,246 @@
 const el = {
-  preset: document.getElementById('preset'), bgColor: document.getElementById('bgColor'), bgImage: document.getElementById('bgImage'),
-  mainText: document.getElementById('mainText'), textSize: document.getElementById('textSize'), textColorMode: document.getElementById('textColorMode'),
-  textColorA: document.getElementById('textColorA'), textColorB: document.getElementById('textColorB'), textTextureImage: document.getElementById('textTextureImage'),
-  textStrokeWidth: document.getElementById('textStrokeWidth'), textStrokeColor: document.getElementById('textStrokeColor'),
-  shadowType: document.getElementById('shadowType'), shadowColor: document.getElementById('shadowColor'), shadowRadius: document.getElementById('shadowRadius'), shadowBlur: document.getElementById('shadowBlur'),
-  glowType: document.getElementById('glowType'), glowColor: document.getElementById('glowColor'), glowRadius: document.getElementById('glowRadius'), glowBlur: document.getElementById('glowBlur'),
-  imgZoom: document.getElementById('imgZoom'), imgScale: document.getElementById('imgScale'), imgX: document.getElementById('imgX'), imgY: document.getElementById('imgY'), imgRotate: document.getElementById('imgRotate'),
-  imgColorMode: document.getElementById('imgColorMode'), imgColorA: document.getElementById('imgColorA'), imgColorB: document.getElementById('imgColorB'), imgTexture: document.getElementById('imgTexture'),
-  imgStrokeWidth: document.getElementById('imgStrokeWidth'), imgStrokeColor: document.getElementById('imgStrokeColor'), imgShadowBlur: document.getElementById('imgShadowBlur'), imgShadowX: document.getElementById('imgShadowX'), imgShadowY: document.getElementById('imgShadowY'), imgShadowColor: document.getElementById('imgShadowColor'), imgBlend: document.getElementById('imgBlend'),
-  downloadBtn: document.getElementById('downloadBtn'), resetBtn: document.getElementById('resetBtn'), canvas: document.getElementById('canvas')
+  canvas: document.getElementById('canvas'),
+  preset: document.getElementById('preset'),
+  bgColor: document.getElementById('bgColor'),
+  imgUpload: document.getElementById('imgUpload'),
+  imgScale: document.getElementById('imgScale'),
+  imgRotate: document.getElementById('imgRotate'),
+  imgBlend: document.getElementById('imgBlend'),
+  textValue: document.getElementById('textValue'),
+  textSize: document.getElementById('textSize'),
+  textColor: document.getElementById('textColor'),
+  layersList: document.getElementById('layersList'),
+  addLayerBtn: document.getElementById('addLayerBtn'),
+  downloadBtn: document.getElementById('downloadBtn')
+};
+const ctx = el.canvas.getContext('2d');
+
+let idSeq = 4;
+const state = {
+  background: { color: '#1f2937', visible: true, locked: false },
+  imageBase: { image: null, scale: 1, rotate: 0, blend: 'source-over', x: 0.5, y: 0.5 },
+  textBase: { value: 'YOUR MESSAGE', size: 120, color: '#ffffff', x: 0.12, y: 0.72 },
+  layers: [
+    { id: 1, type: 'background', name: 'Background', visible: true, locked: false },
+    { id: 2, type: 'image', name: 'Image 1', visible: true, locked: false, data: {} },
+    { id: 3, type: 'text', name: 'Text 1', visible: true, locked: false, data: {} }
+  ],
+  selectedLayerId: 3
 };
 
-const ctx = el.canvas.getContext('2d');
-let uploadedImage = null;
-let textTextureImage = null;
-let textPattern = null;
-let textState = { x: 0.5, y: 0.65, size: 120 };
-let textBounds = null;
-let interaction = { mode: null, pointerId: null, startX: 0, startY: 0, originX: 0, originY: 0, originSize: 120 };
-
-const defaults = { preset: '1200x628', bgColor: '#1f2937', mainText: 'YOUR MAIN MESSAGE', textSize: 120 };
-
-function resizeCanvasFromPreset() {
-  const [w, h] = el.preset.value.split('x').map(Number);
-  el.canvas.width = w;
-  el.canvas.height = h;
-  textState.x = Math.min(0.9, Math.max(0.1, textState.x));
-  textState.y = Math.min(0.9, Math.max(0.1, textState.y));
+function applyLayerData(layer) {
+  if (layer.type === 'image') {
+    Object.assign(state.imageBase, layer.data);
+    el.imgScale.value = state.imageBase.scale;
+    el.imgRotate.value = state.imageBase.rotate;
+    el.imgBlend.value = state.imageBase.blend;
+  }
+  if (layer.type === 'text') {
+    Object.assign(state.textBase, layer.data);
+    el.textValue.value = state.textBase.value;
+    el.textSize.value = state.textBase.size;
+    el.textColor.value = state.textBase.color;
+  }
 }
 
-function loadImage(file, cb) {
-  if (!file) return cb(null);
-  const reader = new FileReader();
-  reader.onload = () => {
-    const image = new Image();
-    image.onload = () => cb(image);
-    image.src = reader.result;
-  };
-  reader.readAsDataURL(file);
+function persistLayerData(layer) {
+  if (layer.type === 'image') layer.data = { ...state.imageBase };
+  if (layer.type === 'text') layer.data = { ...state.textBase };
 }
 
-function drawImageLayer() {
-  if (!uploadedImage) return;
+function selectedLayer() {
+  return state.layers.find((l) => l.id === state.selectedLayerId);
+}
+
+function renderLayersUI() {
+  el.layersList.innerHTML = '';
+  state.layers.forEach((layer) => {
+    const row = document.createElement('div');
+    row.className = `layer-row ${layer.id === state.selectedLayerId ? 'active' : ''}`;
+
+    const nameBtn = document.createElement('button');
+    nameBtn.className = 'layer-name';
+    nameBtn.textContent = layer.name;
+    nameBtn.onclick = () => {
+      state.selectedLayerId = layer.id;
+      applyLayerData(layer);
+      renderLayersUI();
+      render();
+    };
+
+    const actions = document.createElement('div');
+    actions.className = 'layer-actions';
+
+    const hideBtn = document.createElement('button');
+    hideBtn.textContent = layer.visible ? 'Hide' : 'Show';
+    hideBtn.onclick = () => {
+      layer.visible = !layer.visible;
+      renderLayersUI();
+      render();
+    };
+
+    const lockBtn = document.createElement('button');
+    lockBtn.textContent = layer.locked ? 'Unlock' : 'Lock';
+    lockBtn.onclick = () => {
+      layer.locked = !layer.locked;
+      renderLayersUI();
+    };
+
+    const dupBtn = document.createElement('button');
+    dupBtn.textContent = 'Dup';
+    dupBtn.onclick = () => {
+      const copy = { ...layer, id: ++idSeq, name: `${layer.name} Copy`, data: { ...(layer.data || {}) } };
+      state.layers.push(copy);
+      renderLayersUI();
+      render();
+    };
+
+    const delBtn = document.createElement('button');
+    delBtn.textContent = 'Del';
+    delBtn.onclick = () => {
+      if (state.layers.length <= 1) return;
+      state.layers = state.layers.filter((l) => l.id !== layer.id);
+      if (state.selectedLayerId === layer.id) state.selectedLayerId = state.layers[state.layers.length - 1].id;
+      renderLayersUI();
+      render();
+    };
+
+    actions.append(hideBtn, lockBtn, dupBtn, delBtn);
+    row.append(nameBtn, actions);
+    el.layersList.append(row);
+  });
+}
+
+function drawBackground(layer) {
+  if (!layer.visible) return;
+  ctx.fillStyle = state.background.color;
+  ctx.fillRect(0, 0, el.canvas.width, el.canvas.height);
+}
+
+function drawImageLayer(layer) {
+  if (!layer.visible || !state.imageBase.image) return;
+  const img = state.imageBase.image;
   const cw = el.canvas.width;
   const ch = el.canvas.height;
-  const zoom = Number(el.imgZoom.value);
-  const scale = Number(el.imgScale.value);
-  const xShift = Number(el.imgX.value) * cw * 0.25;
-  const yShift = Number(el.imgY.value) * ch * 0.25;
-  const rotate = (Number(el.imgRotate.value) * Math.PI) / 180;
-
-  const coverScale = Math.max(cw / uploadedImage.width, ch / uploadedImage.height);
-  const finalScale = coverScale * zoom * scale;
-  const drawW = uploadedImage.width * finalScale;
-  const drawH = uploadedImage.height * finalScale;
-
+  const scale = Number(state.imageBase.scale);
+  const rotate = (Number(state.imageBase.rotate) * Math.PI) / 180;
+  const fit = Math.max(cw / img.width, ch / img.height);
+  const w = img.width * fit * scale;
+  const h = img.height * fit * scale;
   ctx.save();
-  ctx.translate(cw / 2 + xShift, ch / 2 + yShift);
+  ctx.translate(cw * state.imageBase.x, ch * state.imageBase.y);
   ctx.rotate(rotate);
-  ctx.globalCompositeOperation = el.imgBlend.value;
-  ctx.shadowBlur = Number(el.imgShadowBlur.value);
-  ctx.shadowOffsetX = Number(el.imgShadowX.value);
-  ctx.shadowOffsetY = Number(el.imgShadowY.value);
-  ctx.shadowColor = el.imgShadowColor.value;
-  ctx.drawImage(uploadedImage, -drawW / 2, -drawH / 2, drawW, drawH);
-
-  if (el.imgColorMode.value !== 'none') {
-    ctx.globalCompositeOperation = 'source-atop';
-    if (el.imgColorMode.value === 'solid') {
-      ctx.fillStyle = el.imgColorA.value;
-    } else {
-      const grad = ctx.createLinearGradient(-drawW / 2, -drawH / 2, drawW / 2, drawH / 2);
-      grad.addColorStop(0, el.imgColorA.value);
-      grad.addColorStop(1, el.imgColorB.value);
-      ctx.fillStyle = grad;
-    }
-    ctx.globalAlpha = 0.35;
-    ctx.fillRect(-drawW / 2, -drawH / 2, drawW, drawH);
-    ctx.globalAlpha = 1;
-  }
-
-  if (el.imgTexture.value === 'grid') {
-    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-    const gap = Math.max(12, Math.round(drawW / 30));
-    for (let x = -drawW / 2; x <= drawW / 2; x += gap) {
-      ctx.beginPath(); ctx.moveTo(x, -drawH / 2); ctx.lineTo(x, drawH / 2); ctx.stroke();
-    }
-    for (let y = -drawH / 2; y <= drawH / 2; y += gap) {
-      ctx.beginPath(); ctx.moveTo(-drawW / 2, y); ctx.lineTo(drawW / 2, y); ctx.stroke();
-    }
-  }
-  if (el.imgTexture.value === 'noise') {
-    for (let i = 0; i < 1700; i += 1) {
-      ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.12})`;
-      ctx.fillRect((-drawW / 2) + Math.random() * drawW, (-drawH / 2) + Math.random() * drawH, 1, 1);
-    }
-  }
-
-  const sw = Number(el.imgStrokeWidth.value);
-  if (sw > 0) {
-    ctx.globalCompositeOperation = 'source-over';
-    ctx.strokeStyle = el.imgStrokeColor.value;
-    ctx.lineWidth = sw;
-    ctx.strokeRect(-drawW / 2, -drawH / 2, drawW, drawH);
-  }
-
+  ctx.globalCompositeOperation = state.imageBase.blend;
+  ctx.drawImage(img, -w / 2, -h / 2, w, h);
   ctx.restore();
   ctx.globalCompositeOperation = 'source-over';
-  ctx.shadowBlur = 0;
 }
 
-function makeTextFillStyle(x, y, w, h) {
-  if (textPattern) return textPattern;
-  if (el.textColorMode.value === 'gradient') {
-    const grad = ctx.createLinearGradient(x, y - h, x + w, y);
-    grad.addColorStop(0, el.textColorA.value);
-    grad.addColorStop(1, el.textColorB.value);
-    return grad;
-  }
-  return el.textColorA.value;
-}
-
-function drawInnerEffect(text, x, y, effectColor, blur, radius, mode) {
-  const font = `900 ${Math.round(textState.size)}px Inter, Arial, sans-serif`;
+function drawTextLayer(layer) {
+  if (!layer.visible) return;
+  const t = state.textBase;
   ctx.save();
-  ctx.font = font;
-  ctx.textBaseline = 'alphabetic';
-  ctx.fillStyle = makeTextFillStyle(x, y, textBounds.width, textBounds.height);
-  ctx.fillText(text, x, y);
-  ctx.globalCompositeOperation = mode;
-  ctx.shadowColor = effectColor;
-  ctx.shadowBlur = blur;
-  ctx.shadowOffsetX = radius;
-  ctx.shadowOffsetY = radius;
-  ctx.fillStyle = effectColor;
-  ctx.fillText(text, x, y);
+  ctx.font = `900 ${Number(t.size)}px Inter, Arial, sans-serif`;
+  ctx.fillStyle = t.color;
+  ctx.fillText(t.value || '', el.canvas.width * t.x, el.canvas.height * t.y, el.canvas.width * 0.86);
   ctx.restore();
-}
-
-function drawTextLayer() {
-  const text = el.mainText.value || ' ';
-  textState.size = Number(el.textSize.value);
-  const cw = el.canvas.width;
-  const ch = el.canvas.height;
-  const x = textState.x * cw;
-  const y = textState.y * ch;
-  const font = `900 ${Math.round(textState.size)}px Inter, Arial, sans-serif`;
-
-  ctx.save();
-  ctx.font = font;
-  ctx.textBaseline = 'alphabetic';
-  const metrics = ctx.measureText(text);
-  const width = metrics.width;
-  const ascent = metrics.actualBoundingBoxAscent || textState.size * 0.75;
-  const descent = metrics.actualBoundingBoxDescent || textState.size * 0.25;
-  const height = ascent + descent;
-  textBounds = { x, y, width, height, ascent, descent, handle: 20 };
-
-  if (el.shadowType.value === 'outer') {
-    ctx.shadowColor = el.shadowColor.value;
-    ctx.shadowBlur = Number(el.shadowBlur.value);
-    ctx.shadowOffsetX = Number(el.shadowRadius.value);
-    ctx.shadowOffsetY = Number(el.shadowRadius.value);
-  }
-
-  if (el.glowType.value === 'outer') {
-    ctx.shadowColor = el.glowColor.value;
-    ctx.shadowBlur = Number(el.glowBlur.value);
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 0;
-  }
-
-  ctx.fillStyle = makeTextFillStyle(x, y, width, height);
-  ctx.fillText(text, x, y);
-
-  const sw = Number(el.textStrokeWidth.value);
-  if (sw > 0) {
-    ctx.lineWidth = sw;
-    ctx.strokeStyle = el.textStrokeColor.value;
-    ctx.strokeText(text, x, y);
-  }
-
-  ctx.restore();
-
-  if (el.shadowType.value === 'inner') {
-    drawInnerEffect(text, x, y, el.shadowColor.value, Number(el.shadowBlur.value), Number(el.shadowRadius.value), 'source-atop');
-  }
-  if (el.glowType.value === 'inner') {
-    drawInnerEffect(text, x, y, el.glowColor.value, Number(el.glowBlur.value), Number(el.glowRadius.value), 'lighter');
-  }
-
-  drawTextSelection();
-}
-
-function drawTextSelection() {
-  if (!textBounds) return;
-  const { x, y, width, ascent, descent, handle } = textBounds;
-  const left = x - 10;
-  const top = y - ascent - 10;
-  const boxW = width + 20;
-  const boxH = ascent + descent + 20;
-
-  ctx.save();
-  ctx.strokeStyle = 'rgba(99, 102, 241, 0.9)';
-  ctx.setLineDash([8, 6]);
-  ctx.lineWidth = 2;
-  ctx.strokeRect(left, top, boxW, boxH);
-  ctx.setLineDash([]);
-  ctx.fillStyle = '#6366f1';
-  ctx.fillRect(left + boxW - handle, top + boxH - handle, handle, handle);
-  ctx.restore();
-  textBounds.box = { left, top, boxW, boxH };
-  textBounds.handleRect = { x: left + boxW - handle, y: top + boxH - handle, w: handle, h: handle };
 }
 
 function render() {
   ctx.clearRect(0, 0, el.canvas.width, el.canvas.height);
-  ctx.fillStyle = el.bgColor.value;
-  ctx.fillRect(0, 0, el.canvas.width, el.canvas.height);
-  drawImageLayer();
-  drawTextLayer();
+  state.layers.forEach((layer) => {
+    if (layer.type === 'background') drawBackground(layer);
+    if (layer.type === 'image') drawImageLayer(layer);
+    if (layer.type === 'text') drawTextLayer(layer);
+  });
 }
 
-function isInsideRect(px, py, rect) {
-  return px >= rect.x && px <= rect.x + rect.w && py >= rect.y && py <= rect.y + rect.h;
-}
-
-function pointerPos(evt) {
-  const rect = el.canvas.getBoundingClientRect();
-  const scaleX = el.canvas.width / rect.width;
-  const scaleY = el.canvas.height / rect.height;
-  return { x: (evt.clientX - rect.left) * scaleX, y: (evt.clientY - rect.top) * scaleY };
-}
-
-function onPointerDown(evt) {
-  if (!textBounds) return;
-  const p = pointerPos(evt);
-  const inHandle = isInsideRect(p.x, p.y, textBounds.handleRect);
-  const inBox = p.x >= textBounds.box.left && p.x <= textBounds.box.left + textBounds.box.boxW && p.y >= textBounds.box.top && p.y <= textBounds.box.top + textBounds.box.boxH;
-  if (!inHandle && !inBox) return;
-
-  interaction.mode = inHandle ? 'resize' : 'drag';
-  interaction.pointerId = evt.pointerId;
-  interaction.startX = p.x;
-  interaction.startY = p.y;
-  interaction.originX = textState.x;
-  interaction.originY = textState.y;
-  interaction.originSize = textState.size;
-  el.canvas.setPointerCapture(evt.pointerId);
-}
-
-function onPointerMove(evt) {
-  if (!interaction.mode || evt.pointerId !== interaction.pointerId) return;
-  const p = pointerPos(evt);
-  const cw = el.canvas.width;
-  const ch = el.canvas.height;
-  const dx = p.x - interaction.startX;
-  const dy = p.y - interaction.startY;
-
-  if (interaction.mode === 'drag') {
-    textState.x = Math.min(0.95, Math.max(0.02, interaction.originX + dx / cw));
-    textState.y = Math.min(0.95, Math.max(0.08, interaction.originY + dy / ch));
-  } else {
-    const nextSize = Math.max(24, Math.min(260, interaction.originSize + (dx + dy) * 0.2));
-    textState.size = nextSize;
-    el.textSize.value = String(Math.round(nextSize));
+function updateSelectedLayerFromControls() {
+  const layer = selectedLayer();
+  if (!layer || layer.locked) return;
+  if (layer.type === 'background') {
+    state.background.color = el.bgColor.value;
+    layer.data = { ...state.background };
+  }
+  if (layer.type === 'image') {
+    state.imageBase.scale = Number(el.imgScale.value);
+    state.imageBase.rotate = Number(el.imgRotate.value);
+    state.imageBase.blend = el.imgBlend.value;
+    persistLayerData(layer);
+  }
+  if (layer.type === 'text') {
+    state.textBase.value = el.textValue.value;
+    state.textBase.size = Number(el.textSize.value);
+    state.textBase.color = el.textColor.value;
+    persistLayerData(layer);
   }
   render();
 }
 
-function onPointerUp(evt) {
-  if (evt.pointerId !== interaction.pointerId) return;
-  interaction.mode = null;
-  interaction.pointerId = null;
-}
-
-function setupTabs() {
-  const tabs = [...document.querySelectorAll('.tab')];
-  const panels = [...document.querySelectorAll('.tab-panel')];
-  tabs.forEach((tab) => tab.addEventListener('click', () => {
-    tabs.forEach((t) => t.classList.remove('active'));
-    panels.forEach((p) => p.classList.remove('active'));
-    tab.classList.add('active');
-    document.getElementById(tab.dataset.tab).classList.add('active');
-  }));
-}
-
-[
-  'bgColor', 'mainText', 'textSize', 'textColorMode', 'textColorA', 'textColorB', 'textStrokeWidth', 'textStrokeColor',
-  'shadowType', 'shadowColor', 'shadowRadius', 'shadowBlur', 'glowType', 'glowColor', 'glowRadius', 'glowBlur',
-  'imgZoom', 'imgScale', 'imgX', 'imgY', 'imgRotate', 'imgColorMode', 'imgColorA', 'imgColorB', 'imgTexture',
-  'imgStrokeWidth', 'imgStrokeColor', 'imgShadowBlur', 'imgShadowX', 'imgShadowY', 'imgShadowColor', 'imgBlend'
-].forEach((id) => el[id].addEventListener('input', render));
-
-el.preset.addEventListener('change', () => { resizeCanvasFromPreset(); render(); });
-el.bgImage.addEventListener('change', (e) => loadImage(e.target.files[0], (img) => { uploadedImage = img; render(); }));
-el.textTextureImage.addEventListener('change', (e) => loadImage(e.target.files[0], (img) => {
-  textTextureImage = img;
-  if (!img) {
-    textPattern = null;
-  } else {
-    textPattern = ctx.createPattern(img, 'repeat');
-  }
+el.preset.addEventListener('change', () => {
+  const [w, h] = el.preset.value.split('x').map(Number);
+  el.canvas.width = w;
+  el.canvas.height = h;
   render();
-}));
+});
+
+el.bgColor.addEventListener('input', updateSelectedLayerFromControls);
+el.imgScale.addEventListener('input', updateSelectedLayerFromControls);
+el.imgRotate.addEventListener('input', updateSelectedLayerFromControls);
+el.imgBlend.addEventListener('input', updateSelectedLayerFromControls);
+el.textValue.addEventListener('input', updateSelectedLayerFromControls);
+el.textSize.addEventListener('input', updateSelectedLayerFromControls);
+el.textColor.addEventListener('input', updateSelectedLayerFromControls);
+
+el.imgUpload.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const r = new FileReader();
+  r.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      state.imageBase.image = img;
+      const layer = selectedLayer();
+      if (layer && layer.type === 'image') persistLayerData(layer);
+      render();
+    };
+    img.src = r.result;
+  };
+  r.readAsDataURL(file);
+});
+
+el.addLayerBtn.addEventListener('click', () => {
+  const base = selectedLayer() || state.layers[state.layers.length - 1];
+  const type = base.type === 'background' ? 'text' : base.type;
+  const layer = { id: ++idSeq, type, name: `${type[0].toUpperCase()}${type.slice(1)} ${idSeq}`, visible: true, locked: false, data: {} };
+  if (type === 'text') layer.data = { ...state.textBase };
+  if (type === 'image') layer.data = { ...state.imageBase };
+  state.layers.push(layer);
+  state.selectedLayerId = layer.id;
+  renderLayersUI();
+  render();
+});
+
+Array.from(document.querySelectorAll('.tool-toggle')).forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const target = btn.dataset.target;
+    const panel = document.getElementById(target);
+    const shouldShow = !panel.classList.contains('active');
+    document.querySelectorAll('.tool-panel').forEach((p) => p.classList.remove('active'));
+    document.querySelectorAll('.tool-toggle').forEach((b) => b.classList.remove('active'));
+    if (shouldShow) {
+      panel.classList.add('active');
+      btn.classList.add('active');
+    }
+  });
+});
+
 el.downloadBtn.addEventListener('click', () => {
-  const link = document.createElement('a');
-  link.download = `poster-${el.canvas.width}x${el.canvas.height}.png`;
-  link.href = el.canvas.toDataURL('image/png');
-  link.click();
-});
-el.resetBtn.addEventListener('click', () => {
-  el.preset.value = defaults.preset;
-  el.bgColor.value = defaults.bgColor;
-  el.mainText.value = defaults.mainText;
-  el.textSize.value = String(defaults.textSize);
-  textState = { x: 0.5, y: 0.65, size: defaults.textSize };
-  el.bgImage.value = '';
-  el.textTextureImage.value = '';
-  uploadedImage = null;
-  textTextureImage = null;
-  textPattern = null;
-  resizeCanvasFromPreset();
-  render();
+  const a = document.createElement('a');
+  a.download = `poster-${el.canvas.width}x${el.canvas.height}.png`;
+  a.href = el.canvas.toDataURL('image/png');
+  a.click();
 });
 
-el.canvas.addEventListener('pointerdown', onPointerDown);
-el.canvas.addEventListener('pointermove', onPointerMove);
-el.canvas.addEventListener('pointerup', onPointerUp);
-el.canvas.addEventListener('pointercancel', onPointerUp);
-
-setupTabs();
-resizeCanvasFromPreset();
+renderLayersUI();
 render();
