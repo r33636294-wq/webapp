@@ -10,64 +10,178 @@
     <main class="app">
       <section class="panel">
         <h1>Poster / Banner Editor</h1>
-        <p class="subtitle">Create a quick social banner or printable poster.</p>
+        <p class="subtitle">Build social posts, stories, and custom mobile/fullscreen banners.</p>
 
         <label>
           Preset
           <select id="preset">
             <option value="1200x628">Social Banner (1200×628)</option>
-            <option value="1080x1080">Square Post (1080×1080)</option>
+            <option value="1080x1080">Instagram Post (1080×1080)</option>
+            <option value="1200x1200">Facebook Post (1200×1200)</option>
+            <option value="1080x1920">Instagram Story (1080×1920)</option>
+            <option value="1080x1920">Facebook Story (1080×1920)</option>
+            <option value="1080x2400">Full Screen Mobile (1080×2400)</option>
             <option value="2480x3508">A4 Poster (2480×3508)</option>
             <option value="1920x1080">Presentation Slide (1920×1080)</option>
           </select>
         </label>
 
         <label>
-          Background Color
+          Canvas Color
           <input id="bgColor" type="color" value="#1f2937" />
         </label>
 
-        <label>
-          Background Image
-          <input id="bgImage" type="file" accept="image/*" />
-        </label>
-
-        <label>
-          Title
-          <input id="titleText" type="text" value="YOUR EVENT TITLE" maxlength="80" />
-        </label>
-
-        <div class="row">
-          <label>
-            Title Color
-            <input id="titleColor" type="color" value="#ffffff" />
-          </label>
-          <label>
-            Size
-            <input id="titleSize" type="range" min="24" max="240" value="96" />
-          </label>
+        <div class="tabs">
+          <button class="tab active" data-tab="textTab" type="button">Text</button>
+          <button class="tab" data-tab="imageTab" type="button">Image Tools</button>
         </div>
 
-        <label>
-          Subtitle
-          <input id="subtitleText" type="text" value="Date • Venue • Call to Action" maxlength="120" />
-        </label>
-
-        <div class="row">
+        <section id="textTab" class="tab-panel active">
           <label>
-            Subtitle Color
-            <input id="subtitleColor" type="color" value="#f3f4f6" />
+            Title
+            <input id="titleText" type="text" value="YOUR EVENT TITLE" maxlength="80" />
           </label>
-          <label>
-            Size
-            <input id="subtitleSize" type="range" min="16" max="120" value="42" />
-          </label>
-        </div>
 
-        <label>
-          Overlay Strength
-          <input id="overlay" type="range" min="0" max="0.9" step="0.05" value="0.35" />
-        </label>
+          <div class="row">
+            <label>
+              Title Color
+              <input id="titleColor" type="color" value="#ffffff" />
+            </label>
+            <label>
+              Size
+              <input id="titleSize" type="range" min="24" max="240" value="96" />
+            </label>
+          </div>
+
+          <label>
+            Subtitle
+            <input id="subtitleText" type="text" value="Date • Venue • Call to Action" maxlength="120" />
+          </label>
+
+          <div class="row">
+            <label>
+              Subtitle Color
+              <input id="subtitleColor" type="color" value="#f3f4f6" />
+            </label>
+            <label>
+              Size
+              <input id="subtitleSize" type="range" min="16" max="120" value="42" />
+            </label>
+          </div>
+
+          <label>
+            Overlay Strength
+            <input id="overlay" type="range" min="0" max="0.9" step="0.05" value="0.35" />
+          </label>
+        </section>
+
+        <section id="imageTab" class="tab-panel">
+          <label>
+            Import / Add Image
+            <input id="bgImage" type="file" accept="image/*" />
+          </label>
+
+          <div class="row">
+            <label>
+              Crop Zoom
+              <input id="imgZoom" type="range" min="0.4" max="3" step="0.05" value="1" />
+            </label>
+            <label>
+              Resize
+              <input id="imgScale" type="range" min="0.3" max="2" step="0.05" value="1" />
+            </label>
+          </div>
+
+          <div class="row">
+            <label>
+              Move X
+              <input id="imgX" type="range" min="-1" max="1" step="0.01" value="0" />
+            </label>
+            <label>
+              Move Y
+              <input id="imgY" type="range" min="-1" max="1" step="0.01" value="0" />
+            </label>
+          </div>
+
+          <label>
+            Rotate
+            <input id="imgRotate" type="range" min="-180" max="180" step="1" value="0" />
+          </label>
+
+          <div class="row">
+            <label>
+              Color Fill
+              <select id="imgColorMode">
+                <option value="none">None</option>
+                <option value="solid">Solid</option>
+                <option value="gradient">Gradient</option>
+              </select>
+            </label>
+            <label>
+              Blend Mode
+              <select id="imgBlend">
+                <option value="source-over">Normal</option>
+                <option value="lighten">Lighten</option>
+                <option value="darken">Darken</option>
+                <option value="overlay">Overlay</option>
+                <option value="screen">Screen</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="row">
+            <label>
+              Color A
+              <input id="imgColorA" type="color" value="#ff6b6b" />
+            </label>
+            <label>
+              Color B
+              <input id="imgColorB" type="color" value="#4d96ff" />
+            </label>
+          </div>
+
+          <div class="row">
+            <label>
+              Texture
+              <select id="imgTexture">
+                <option value="none">None</option>
+                <option value="noise">Noise</option>
+                <option value="grid">Grid</option>
+              </select>
+            </label>
+            <label>
+              Stroke Width
+              <input id="imgStrokeWidth" type="range" min="0" max="30" step="1" value="0" />
+            </label>
+          </div>
+
+          <div class="row">
+            <label>
+              Stroke Color
+              <input id="imgStrokeColor" type="color" value="#ffffff" />
+            </label>
+            <label>
+              Shadow Blur
+              <input id="imgShadowBlur" type="range" min="0" max="80" step="1" value="0" />
+            </label>
+          </div>
+
+          <div class="row">
+            <label>
+              Shadow X
+              <input id="imgShadowX" type="range" min="-80" max="80" step="1" value="0" />
+            </label>
+            <label>
+              Shadow Y
+              <input id="imgShadowY" type="range" min="-80" max="80" step="1" value="0" />
+            </label>
+          </div>
+
+          <label>
+            Shadow Color
+            <input id="imgShadowColor" type="color" value="#000000" />
+          </label>
+        </section>
 
         <div class="actions">
           <button id="downloadBtn">Download PNG</button>

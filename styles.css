@@ -7,9 +7,7 @@
   --accent: #6366f1;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
@@ -21,7 +19,7 @@ body {
 .app {
   min-height: 100vh;
   display: grid;
-  grid-template-columns: minmax(320px, 380px) 1fr;
+  grid-template-columns: minmax(340px, 430px) 1fr;
   gap: 1rem;
   padding: 1rem;
 }
@@ -34,50 +32,38 @@ body {
   display: grid;
   gap: 0.9rem;
   align-content: start;
+  max-height: calc(100vh - 2rem);
+  overflow: auto;
 }
 
-.subtitle {
-  margin: -0.5rem 0 0.5rem;
-  color: var(--muted);
-}
+.subtitle { margin: -0.5rem 0 0.5rem; color: var(--muted); }
+label { display: grid; gap: 0.35rem; font-size: 0.88rem; }
+input, select, button { font: inherit; }
 
-label {
-  display: grid;
-  gap: 0.35rem;
-  font-size: 0.9rem;
-}
-
-input,
-select,
-button {
-  font: inherit;
-}
-
-input[type='text'],
-select {
+input[type='text'], select {
   border: 1px solid #334067;
   border-radius: 8px;
   padding: 0.55rem 0.65rem;
   background: #0f172a;
   color: var(--text);
 }
+input[type='file'] { color: var(--muted); }
 
-input[type='file'] {
-  color: var(--muted);
+.tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+.tab {
+  background: #1f2b45;
+  border: 1px solid #334067;
+  border-radius: 8px;
+  padding: 0.55rem;
 }
+.tab.active { background: var(--accent); border-color: #7174ff; }
 
-.row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
-}
+.tab-panel { display: none; gap: 0.8rem; }
+.tab-panel.active { display: grid; }
 
-.actions {
-  margin-top: 0.5rem;
-  display: flex;
-  gap: 0.75rem;
-}
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
 
+.actions { margin-top: 0.5rem; display: flex; gap: 0.75rem; }
 button {
   border: 0;
   border-radius: 10px;
@@ -87,10 +73,7 @@ button {
   cursor: pointer;
   font-weight: 600;
 }
-
-button.secondary {
-  background: #24324f;
-}
+button.secondary { background: #24324f; }
 
 .preview-wrap {
   display: grid;
@@ -110,18 +93,10 @@ button.secondary {
   background: #111827;
 }
 
-canvas {
-  display: block;
-  width: min(100%, 1200px);
-  height: auto;
-}
+canvas { display: block; width: min(100%, 1200px); height: auto; }
 
 @media (max-width: 1000px) {
-  .app {
-    grid-template-columns: 1fr;
-  }
-
-  .stage {
-    max-height: 60vh;
-  }
+  .app { grid-template-columns: 1fr; }
+  .stage { max-height: 60vh; }
+  .panel { max-height: unset; }
 }

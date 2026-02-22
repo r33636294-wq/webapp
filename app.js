@@ -9,6 +9,22 @@ const elements = {
   subtitleColor: document.getElementById('subtitleColor'),
   subtitleSize: document.getElementById('subtitleSize'),
   overlay: document.getElementById('overlay'),
+  imgZoom: document.getElementById('imgZoom'),
+  imgScale: document.getElementById('imgScale'),
+  imgX: document.getElementById('imgX'),
+  imgY: document.getElementById('imgY'),
+  imgRotate: document.getElementById('imgRotate'),
+  imgColorMode: document.getElementById('imgColorMode'),
+  imgColorA: document.getElementById('imgColorA'),
+  imgColorB: document.getElementById('imgColorB'),
+  imgTexture: document.getElementById('imgTexture'),
+  imgStrokeWidth: document.getElementById('imgStrokeWidth'),
+  imgStrokeColor: document.getElementById('imgStrokeColor'),
+  imgShadowBlur: document.getElementById('imgShadowBlur'),
+  imgShadowX: document.getElementById('imgShadowX'),
+  imgShadowY: document.getElementById('imgShadowY'),
+  imgShadowColor: document.getElementById('imgShadowColor'),
+  imgBlend: document.getElementById('imgBlend'),
   downloadBtn: document.getElementById('downloadBtn'),
   resetBtn: document.getElementById('resetBtn'),
   canvas: document.getElementById('canvas')
@@ -26,7 +42,23 @@ const defaults = {
   subtitleText: 'Date • Venue • Call to Action',
   subtitleColor: '#f3f4f6',
   subtitleSize: 42,
-  overlay: 0.35
+  overlay: 0.35,
+  imgZoom: 1,
+  imgScale: 1,
+  imgX: 0,
+  imgY: 0,
+  imgRotate: 0,
+  imgColorMode: 'none',
+  imgColorA: '#ff6b6b',
+  imgColorB: '#4d96ff',
+  imgTexture: 'none',
+  imgStrokeWidth: 0,
+  imgStrokeColor: '#ffffff',
+  imgShadowBlur: 0,
+  imgShadowX: 0,
+  imgShadowY: 0,
+  imgShadowColor: '#000000',
+  imgBlend: 'source-over'
 };
 
 function resizeCanvasFromPreset() {
@@ -35,24 +67,98 @@ function resizeCanvasFromPreset() {
   elements.canvas.height = h;
 }
 
-function drawCoverImage(img, cw, ch) {
-  const imageRatio = img.width / img.height;
-  const canvasRatio = cw / ch;
+function drawImageTexture(width, height) {
+  const texture = elements.imgTexture.value;
+  if (texture === 'none') return;
 
-  let sx = 0;
-  let sy = 0;
-  let sw = img.width;
-  let sh = img.height;
-
-  if (imageRatio > canvasRatio) {
-    sw = img.height * canvasRatio;
-    sx = (img.width - sw) / 2;
-  } else {
-    sh = img.width / canvasRatio;
-    sy = (img.height - sh) / 2;
+  ctx.save();
+  if (texture === 'noise') {
+    for (let i = 0; i < 1800; i += 1) {
+      const x = Math.random() * width;
+      const y = Math.random() * height;
+      const alpha = Math.random() * 0.12;
+      ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+      ctx.fillRect(x, y, 1, 1);
+    }
   }
 
-  ctx.drawImage(img, sx, sy, sw, sh, 0, 0, cw, ch);
+  if (texture === 'grid') {
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+    ctx.lineWidth = 1;
+    const gap = Math.max(14, Math.round(width / 32));
+    for (let x = 0; x <= width; x += gap) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, height);
+      ctx.stroke();
+    }
+    for (let y = 0; y <= height; y += gap) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(width, y);
+      ctx.stroke();
+    }
+  }
+  ctx.restore();
+}
+
+function drawStyledImage() {
+  if (!uploadedImage) return;
+
+  const cw = elements.canvas.width;
+  const ch = elements.canvas.height;
+  const zoom = Number(elements.imgZoom.value);
+  const scale = Number(elements.imgScale.value);
+  const xShift = Number(elements.imgX.value) * cw * 0.25;
+  const yShift = Number(elements.imgY.value) * ch * 0.25;
+  const rotate = (Number(elements.imgRotate.value) * Math.PI) / 180;
+
+  const coverScale = Math.max(cw / uploadedImage.width, ch / uploadedImage.height);
+  const finalScale = coverScale * zoom * scale;
+  const drawW = uploadedImage.width * finalScale;
+  const drawH = uploadedImage.height * finalScale;
+
+  ctx.save();
+  ctx.translate(cw / 2 + xShift, ch / 2 + yShift);
+  ctx.rotate(rotate);
+  ctx.globalCompositeOperation = elements.imgBlend.value;
+  ctx.shadowBlur = Number(elements.imgShadowBlur.value);
+  ctx.shadowOffsetX = Number(elements.imgShadowX.value);
+  ctx.shadowOffsetY = Number(elements.imgShadowY.value);
+  ctx.shadowColor = elements.imgShadowColor.value;
+  ctx.drawImage(uploadedImage, -drawW / 2, -drawH / 2, drawW, drawH);
+
+  const colorMode = elements.imgColorMode.value;
+  if (colorMode !== 'none') {
+    ctx.globalCompositeOperation = 'source-atop';
+    if (colorMode === 'solid') {
+      ctx.fillStyle = elements.imgColorA.value;
+      ctx.globalAlpha = 0.35;
+      ctx.fillRect(-drawW / 2, -drawH / 2, drawW, drawH);
+    } else {
+      const grad = ctx.createLinearGradient(-drawW / 2, -drawH / 2, drawW / 2, drawH / 2);
+      grad.addColorStop(0, elements.imgColorA.value);
+      grad.addColorStop(1, elements.imgColorB.value);
+      ctx.fillStyle = grad;
+      ctx.globalAlpha = 0.35;
+      ctx.fillRect(-drawW / 2, -drawH / 2, drawW, drawH);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  drawImageTexture(drawW, drawH);
+
+  const strokeWidth = Number(elements.imgStrokeWidth.value);
+  if (strokeWidth > 0) {
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.strokeStyle = elements.imgStrokeColor.value;
+    ctx.lineWidth = strokeWidth;
+    ctx.strokeRect(-drawW / 2, -drawH / 2, drawW, drawH);
+  }
+
+  ctx.restore();
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.shadowBlur = 0;
 }
 
 function drawTextBlock() {
@@ -79,13 +185,10 @@ function render() {
   const h = elements.canvas.height;
 
   ctx.clearRect(0, 0, w, h);
-
   ctx.fillStyle = elements.bgColor.value;
   ctx.fillRect(0, 0, w, h);
 
-  if (uploadedImage) {
-    drawCoverImage(uploadedImage, w, h);
-  }
+  drawStyledImage();
 
   const overlayValue = Number(elements.overlay.value);
   if (overlayValue > 0) {
@@ -130,9 +233,7 @@ function downloadPNG() {
 
 function reset() {
   Object.entries(defaults).forEach(([key, value]) => {
-    if (elements[key]) {
-      elements[key].value = value;
-    }
+    if (elements[key]) elements[key].value = value;
   });
   elements.bgImage.value = '';
   uploadedImage = null;
@@ -140,18 +241,24 @@ function reset() {
   render();
 }
 
+function setupTabs() {
+  const tabs = Array.from(document.querySelectorAll('.tab'));
+  const panels = Array.from(document.querySelectorAll('.tab-panel'));
+  tabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      tabs.forEach((entry) => entry.classList.remove('active'));
+      panels.forEach((panel) => panel.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(tab.dataset.tab).classList.add('active');
+    });
+  });
+}
+
 [
-  'bgColor',
-  'titleText',
-  'titleColor',
-  'titleSize',
-  'subtitleText',
-  'subtitleColor',
-  'subtitleSize',
-  'overlay'
-].forEach((id) => {
-  elements[id].addEventListener('input', render);
-});
+  'bgColor', 'titleText', 'titleColor', 'titleSize', 'subtitleText', 'subtitleColor', 'subtitleSize', 'overlay',
+  'imgZoom', 'imgScale', 'imgX', 'imgY', 'imgRotate', 'imgColorMode', 'imgColorA', 'imgColorB', 'imgTexture',
+  'imgStrokeWidth', 'imgStrokeColor', 'imgShadowBlur', 'imgShadowX', 'imgShadowY', 'imgShadowColor', 'imgBlend'
+].forEach((id) => elements[id].addEventListener('input', render));
 
 elements.preset.addEventListener('change', () => {
   resizeCanvasFromPreset();
@@ -167,5 +274,6 @@ elements.downloadBtn.addEventListener('click', downloadPNG);
 
 elements.resetBtn.addEventListener('click', reset);
 
+setupTabs();
 resizeCanvasFromPreset();
 render();
